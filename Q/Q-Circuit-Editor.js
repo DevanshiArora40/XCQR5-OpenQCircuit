@@ -1318,29 +1318,28 @@ Q.Circuit.Editor.onPointerPress = function( event ){
 		}
 		if( controlEl ) Q.Circuit.Editor.createControl( circuitEl )
 		if( swapEl ) Q.Circuit.Editor.createSwap( circuitEl )
-		if( addMomentEl ){
-			console.log( '→ Add moment' )
-			
-			// Okay this might looks crazy
-			// I pickup the circuit state to text
-			// Then I add a line break to the last wire
-			// This helps in replace the line break with I
 
-			text = document.getElementById('playground').circuit.toText() + "\n"
-			text = text.trimStart().replaceAll("\n", "-I\n").trimEnd()
-			const circuit = Q(text)
-			if( circuit instanceof Q.Circuit ){//+++++  This validation appears broken!
+		function updateCircuitComponents(circuit) {
+
+			// The same block of code which is
+			// used in playground.html to dynamically
+			// update the text block and circuit at the same time.
+
+			if( circuit instanceof Q.Circuit ){
 
 				circuit.name = 'playground'
 				const domEl = document.getElementById( 'playground' )
+				const inputEl = document.getElementById( circuit.name +'-input' )
 				if( domEl ){
 	
 					while( domEl.lastChild ){
 						
 						domEl.removeChild( domEl.lastChild )
 					}
-					// circuit.sort$()//  Is this still necessary??
 					circuit.toDom( domEl )				
+				}
+				if( inputEl ){
+					inputEl.value = circuit.toText().trimStart()
 				}
 				circuit.evaluate$()
 			}
@@ -1350,36 +1349,38 @@ Q.Circuit.Editor.onPointerPress = function( event ){
 				console.log( 'There’s an error in your circuit!!' )
 			}
 		}
+
+		if( addMomentEl ) {
+			
+			// The approach here is to pick up the state of the circuit
+			// using the toText() function and replacing all the line breaks
+			// with -I. Thus increasing the moments for all the registers.
+
+			// Addidtion of "\n" is crucial to get it replaced with '-I' in the nextline			
+			text = document.getElementById('playground').circuit.toText() + "\n" 
+			text = text.trimStart().replaceAll("\n", "-I\n").trimEnd()
+			const circuit = Q(text)
+			updateCircuitComponents(circuit)
+			
+		}
+
 		if( addRegisterEl ) {
-			console.log( '→ Add register' )
+
+			// I took an empty wire and appended with I's equal to timeWidth of the circuit
+			// Need to find a more dynamic approach to this, as this will only work
+			// on the circuits named 'playground'. If someone could help me with this,
+			// it would be just amazing!!
+
+
 			wire = ""
 			timewidth = document.getElementById('playground').circuit.timewidth
 			text = document.getElementById('playground').circuit.toText()
 			for (i = 0; i < timewidth; i++) wire += "I "
-			text = text + '\n' + wire
+			text += '\n' + wire
 			const circuit = Q(text)
-			if( circuit instanceof Q.Circuit ){//+++++  This validation appears broken!
-
-				circuit.name = 'playground'
-				const domEl = document.getElementById( 'playground' )
-				if( domEl ){
-	
-					while( domEl.lastChild ){
-						
-						domEl.removeChild( domEl.lastChild )
-					}
-					// circuit.sort$()//  Is this still necessary??
-					circuit.toDom( domEl )				
-				}
-				circuit.evaluate$()
-			}
-			else {
-	
-				updateCircuitParts( Q`I` )
-				console.log( 'There’s an error in your circuit!!' )
-			}
-			
+			updateCircuitComponents(circuit)
 		}
+
 
 
 		//  We’re done dealing with external buttons.
