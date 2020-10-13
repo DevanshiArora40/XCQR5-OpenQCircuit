@@ -4,7 +4,6 @@
 
 
 ## Installation
-------------------------------------------------------------------------
 *Using Python 3.7.9 in order to support pytket in future*
 ### Clone:
 ```
