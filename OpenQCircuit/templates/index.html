@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <title>OpenQircuit</title>
+    <meta name="description" content="Quantum computing in your browser.">
+    <meta name="keywords" content="
+			Q, Q.js, Q-js, Qjs, quantum JavaScript,
+			quantum, quantum physics, quantum mechanics, superposition,
+			quantum computer, quantum computer programming, quantum computing, QC, 
+			quantum simulator, quantum computer simulator, 
+			qubit, qbit, gate, Hadamard, Bloch, Bloch Sphere,
+			Web, Web site, website, Web browser, browser, HTML, HTML5, JavaScript, ES6, CSS,
+			Chrome, Firefox, Safari, Opera, Brave, Edge, WebKit, Blink, Gecko, Mozilla,
+			Stewart Smith, Stewart, Stew, Stuart, Steven, Steve, Stewdio, stewartsmith, stew_rtsmith, @stew_rtsmith,
+			Moar, Moar Technologies Corp, MTC,
+			Google, IBM, Microsoft, Amazon, NASA, DWave, D-Wave,
+			Quil, OpenQASM,
+				ProjectQ, Qiskit, 
+				Quantum Development Kit, Cirq, Strawberry Fields, t|ket>,
+				QCL, Quantum pseudocode, Q#, Q|SI>, Q language, qGCL, QFC, QML, LIQUi|>, Quipper,
+            Stanford CS 269 Q: Quantum Computer Programming">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="OpenQCircuit">
+    <meta property="og:description" content="Quantum computing in your browser.">
+    <meta property="og:image" content="https://quantumjavascript.app/assets/Q-website-preview.jpg">
+    <meta property="og:url" content="https://quantumjavascript.app/playground.html">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Q.css')}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/Q-Circuit-Editor.css')}}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/documentation.css')}}">
+    <link href="{{ url_for('static', filename='css/materialize.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='Q-favicon-064.png')}}" rel="icon" type="image/png">
+	<link href="{{ url_for('static', filename='Q-favicon-144.png')}}" rel="apple-touch-icon">
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+</head>
+
+<body>
+    <div id="main"></div>
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='js/Q.js')}}"></script>
+	<script src="{{ url_for('static', filename='js/Q-ComplexNumber.js')}}"></script>
+	<script src="{{ url_for('static', filename='js/Q-Matrix.js')}}"></script>
+	<script src="{{ url_for('static', filename='js/Q-Qubit.js')}}"></script>
+	<script src="{{ url_for('static', filename='js/Q-Gate.js')}}"></script>
+	<script src="{{ url_for('static', filename='js/Q-History.js')}}"></script>
+	<script src="{{ url_for('static', filename='js/Q-Circuit.js')}}"></script>
+	<script src="{{ url_for('static', filename='js/Q-Circuit-Editor.js')}}"></script>
+    <script type="text/javascript">
+        var csrf_token = "{{ csrf_token() }}";
+        var login_page_url = "{{ url_for('auth.login') }}";
+        var app_page_url = "{{ url_for('app.app') }}";
+        var circuit_page_url = "{{ url_for('app.launch') }}";
+        var intro_page_url = "{{ url_for('home.intro') }}";
+        var new_item_url = "{{ url_for('app.new_item') }}";
+        var clear_item_url = "{{ url_for('app.clear_items') }}";
+        var login_url = "{{ url_for('auth.login') }}";
+        var register_url = "{{ url_for('auth.register') }}";
+        var logout_url = "{{ url_for('auth.logout') }}";
+        var default_error_message = "{{ _('Oops, something was wrong!') }}";
+        var empty_body_error_message = "{{ _('Your circuit was empty!') }}";
+        var login_error_message = "{{ _('Empty username or password!') }}";
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="center">
+        <h2 class="teal-text text-lighten-2">OpenQCircuit</h2>
+        <h5 class="light">{{ _('Quantum Computer on your browser') }}</h5>
+        <div class="row">
+            <a href="#login" class="btn waves-effect waves-light red">{{ _('Get Started') }}</a>
+        </div>
+        <img class="responsive-img" src="{{ url_for('static', filename=_('Q-demo-bellstate.gif')) }}">
+    </div>
+{% endblock %}

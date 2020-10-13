@@ -1,0 +1,22 @@
+<div class="row item card-panel hoverable" data-href="{{ url_for('.edit_item', item_id=item.id) }}"
+     data-id="{{ item.id }}" data-body="{{ item.name }}" data-done={{ item.done|tojson }}>
+    <span class="item-body">
+        <p class=".launch-item-id" style="display: none;">{{ item.id }}</p>
+        <a class="button done-btn" data-href="{{ url_for('.toggle_item', item_id=item.id) }}" style="background: transparent; color: #039be5;">
+            <i class="material-icons left">{% if item.done %}check_box{% else %}check_box_outline_blank{% endif %}</i>
+        </a>
+        <span class="{% if item.done %}inactive-item{% else %}active-item{% endif %}"
+              id="body{{ item.id }}">{{ item.name }}</span>
+    </span>
+    <span class="hide edit-btns right">
+        <a class="right button delete-btn" data-href="{{ url_for('.delete_item', item_id=item.id) }}" style="background: transparent; color: #039be5;">
+            <i class="material-icons small-icon left">clear</i>
+        </a>
+        <a class="right button edit-btn" style="background: transparent; color: #039be5;">
+            <i class="material-icons small-icon left">mode_edit</i>
+        </a>
+        <a class="right button launch-btn" style="background: transparent; color: #039be5;">
+            <i class="material-icons small-icon left">launch</i>
+        </a>
+    </span>
+</div>

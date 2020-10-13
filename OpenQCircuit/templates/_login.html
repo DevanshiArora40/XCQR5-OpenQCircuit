@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="login-form">
+        <h4 class="red-text center">{{ _('Login') }}</h4><br>
+        <input class="validate login-input" id="username-input" name="username" type="text" placeholder="Username"
+               autofocus required>
+        <input class="validate login-input" id="password-input" name="password" type="password" placeholder="Password"
+               required>
+        <span class="right">
+            <a class="btn grey" id="register-btn" style="margin-right: 1rem;">{{ _('Get a test account') }}</a>
+            <a class="btn red" id="login-btn">{{ _('Login') }}</a>
+        </span>
+        <p><a class="blue-text link button left" id="toggle-password">{{ _('Toggle Password') }}</a></p>&nbsp;
+    </div>
+{% endblock %}

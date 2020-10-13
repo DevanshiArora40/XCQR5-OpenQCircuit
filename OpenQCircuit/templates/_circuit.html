@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="left" style="margin: 7rem;" data-id="{{circuit.id}}" data-href="{{ url_for('.edit_circuit', item_id=circuit.id) }}">
+    <h3>{{circuit.name}} Playground</h3>
+
+    <div class='Q-circuit-palette'></div>
+    <div id="playground"></div>
+
+    <p>
+        Type, paste, or edit your circuit here.
+        Then tap “Apply” to
+        generate an interactive circuit diagram
+        and other output formats below.
+        You can learn more about Q’s plain text format
+        in <a href="Q-Circuit.html#Writing_quantum_circuits">“Writing quantum circuits.”</a>
+    </p>
+
+    <textarea class="Q-circuit-text-input" id="playground-input">{{circuit.body}}</textarea>
+    <p>
+        <button class="Q-button" id="playground-apply-button" type="button" onclick="updatePlaygroundFromText()">
+            Apply
+        </button>
+        <button class="Q-button" id="playground-save-button" type="button">
+            Save
+        </button>
+        <br><br>
+    </p>
+    <div>
+        <h4>Result probabilities</h4>
+        <pre><samp id="playground-report"></samp></pre>
+    </div>
+
+    <h4>Circuit as ASCII diagram</h4>
+    <p>
+        This can be particularly helpful within the JavaScript console
+        when you need to double check the composition of a circuit
+        in a way that’s more illustrative than simple plain text.
+    </p>
+    <pre><samp id="playground-diagram"></samp></pre>
+
+
+    <!-- h4>Circuit as Amazon Braket code</h4>
+    <p>
+        This code can be copied and then pasted in to an
+        <a href="https://aws.amazon.com/braket/" target="_blank">Amazon Braket</a> Jupyter notebook
+        to be run on a cloud-based simulator
+        or actual quantum hardware.
+        (Requires an 
+        <a href="https://aws.amazon.com/" target="_blank">AWS account</a> and fees may apply.)
+    </p>
+    <pre><samp id="playground-braket"></samp></pre -->
+
+
+    <h4>Circuit as LaTeX code</h4>
+    <p>
+        This code can be used within
+        <a href="https://www.latex-project.org/" target="_blank">LaTeX</a> with the
+        <a href="https://ctan.org/pkg/qcircuit?lang=en" target="_blank">QCircuit</a>
+        library to create circuit diagrams.
+        Note that <code>ctrl{}</code> commands do not yet contain valid index values.
+        <span class="coming-soon">Check back in May 2020.</span>
+    </p>
+    <pre><samp id="playground-latex"></samp></pre>
+
+
+    <h4>Circuit as plain text</h4>
+    <p>
+        If all’s gone well
+        then copying this and pasting this code
+        in to the original text input box
+        should have no effect on the maths.
+    </p>
+    <pre><samp id="playground-text"></samp></pre>
+    <hr>
+    </main>
+    <script>
+        //  Let’s place circuit palettes
+        //  inside anything with the class 'Q-circuit-palette'.
+        document.querySelector('main').style.maxWidth = '80%';
+
+        Array
+            .from(document.querySelectorAll('.Q-circuit-palette'))
+            .forEach(function (el) {
+
+                Q.Circuit.Editor.createPalette(el)
+            })
+
+
+
+
+        //  Hook up our input text field and “Apply” button.
+
+        function applyButtonActivated() {
+
+            const button = document.getElementById('playground-apply-button')
+            if (button && button.getAttribute('disabled') === null) updatePlaygroundFromText()
+        }
+
+        let playgroundInputText = ''
+
+        function hasTextInputUpdated() {
+
+            const
+                input = document.getElementById('playground-input').value
+            button = document.getElementById('playground-apply-button')
+
+            if (input === playgroundInputText) {
+
+                button.setAttribute('disabled', 'disabled')
+            } else button.removeAttribute('disabled')
+        }
+
+
+
+
+        //  When our user edits the plain text input
+        //  we want to update our interactive circuit
+        //  and exported code accordingly.
+
+        function updatePlaygroundFromText() {
+
+            const text = document.getElementById('playground-input').value
+            if (text !== playgroundInputText) {
+
+                playgroundInputText = text
+                // document.getElementById('playground-apply-button').setAttribute('disabled', 'disabled')
+
+                const circuit = Q(text)
+                if (circuit instanceof Q.Circuit) { //+++++  This validation appears broken!
+
+                    circuit.name = 'playground'
+                    const domEl = document.getElementById('playground')
+                    if (domEl) {
+
+                        while (domEl.lastChild) {
+
+                            domEl.removeChild(domEl.lastChild)
+                        }
+                        circuit.sort$() //  Is this still necessary??
+                        circuit.toDom(domEl)
+                    }
+                    circuit.evaluate$()
+                } else {
+
+                    updateCircuitParts(Q `I`)
+                    console.log('There’s an error in your circuit!!')
+                }
+            }
+        }
+
+
+        //  When our user edits the interactive circuit
+        //  we want to update 
+
+        function updatePlaygroundFromDom(circuit) {
+
+            const inputEl = document.getElementById(circuit.name + '-input')
+            if (inputEl) {
+
+                const text = circuit.toText().substr(1)
+                inputEl.value = text
+                circuit.evaluate$()
+                // updateCircuitParts( circuit )
+                playgroundInputText = text
+            }
+        }
+
+
+        //  Update all the export code and probabilities report.
+
+        function updateCircuitParts(circuit) {
+
+            // const braketEl = document.getElementById( circuit.name +'-braket' )
+            // if( braketEl ) braketEl.innerText = '\n'+ circuit.toAmazonBraket( true )
+
+            const latexEl = document.getElementById(circuit.name + '-latex')
+            if (latexEl) latexEl.innerText = '\n' + circuit.toLatex(true)
+
+            const diagramEl = document.getElementById(circuit.name + '-diagram')
+            if (diagramEl) diagramEl.innerText = circuit.toDiagram(true)
+
+            const textEl = document.getElementById(circuit.name + '-text')
+            if (textEl) textEl.innerText = circuit.toText()
+
+            const reportEl = document.getElementById(circuit.name + '-report')
+            if (reportEl) reportEl.innerText = circuit.report$()
+        }
+
+
+
+        window.addEventListener('DOMContentLoaded', function () {
+            updatePlaygroundFromText()
+            setInterval(hasTextInputUpdated, 100)
+        })
+
+        //  EVALUATION.
+
+        window.addEventListener('Q.Circuit.evaluate began', function (event) {
+
+            console.log(
+
+                '\n\nBeginning evaluation for “' + event.detail.circuit.name + '”\n' +
+                event.detail.circuit.toDiagram() + '\n\n'
+            )
+        })
+        window.addEventListener('Q.Circuit.evaluate progressed', function (event) {
+
+            const
+                length = 20,
+                percent = Math.round(event.detail.progress * 100),
+                percentText = ('' + percent).padStart(3) + '%',
+                barLength = Math.round(length * event.detail.progress),
+                barComplete = ''.padStart(barLength, '█'),
+                barRemaining = ''.padStart(length - barLength, '░'),
+                opsTotal = event.detail.operationsTotal,
+                opsCompleted = ('' + event.detail.operationsCompleted).padStart(Math.log(opsTotal) * Math
+                    .LOG10E +
+                    1 |
+                    0, ' ')
+
+            console.log(
+
+                barComplete +
+                barRemaining + ' ' +
+                percentText + '   ' +
+                opsCompleted + ' of ' +
+                opsTotal
+            )
+
+
+            //  What’s the actual state of the circuit at this moment?
+            //  We should come back and do a cool animated version of this data :)
+
+            const state = event.detail.state
+            // console.log( 'state width', state.getWidth(), 'state height', state.getHeight() )
+            // console.log( 'state', state.toTsv() )
+        })
+        window.addEventListener('Q.Circuit.evaluate completed', function (event) {
+
+            console.log(
+
+                '\nEvaluation completed for “' + event.detail.circuit.name + '”' +
+                '\nwith these results:\n' + event.detail.circuit.report$() + '\n\n\n'
+            )
+
+            const
+                circuit = event.detail.circuit,
+                reportEl = document.getElementById(circuit.name + '-report')
+
+            //if( reportEl ) reportEl.innerText = circuit.report$()
+            updateCircuitParts(circuit)
+        })
+        window.addEventListener('Q gui altered circuit', function (event) {
+
+            updatePlaygroundFromDom(event.detail.circuit)
+        })
+    </script>
+</div>
+{% endblock %}

@@ -1,0 +1,2 @@
+FLASK_APP=OpenQCircuit
+FLASK_ENV=development
