@@ -19,6 +19,41 @@ def app():
     return render_template('_app.html', items=current_user.circuits, active_count=active_count, completed_count=completed_count)
 
 
+def qasmConverter(circuit):
+    gates = ["H", "Y", "Z", "P"]
+    qasm_code = "OPENQASM 2.0;\ninclude \"qelib1.inc\";"
+    wires = [i for i in circuit.split('\n')]
+    classical_wires = len(wires)
+    classical_pointer = 0
+    instr = []
+    for i in wires:
+        i = i.split("-")
+        while("" in i):
+            i.remove("")
+        instr.append(i)
+    qasm_code += "\nqreg q[" + str(len(wires)) + "];\ncreg c[" + str(len(wires)) + "];\n"
+
+    for idx in range(len(instr[0])):
+        for idy in range(len(instr)):
+            if instr[idy][idx] in gates:
+                qasm_code += "\n" + ( "s" if instr[idy][idx].lower() == "p" else instr[idy][idx].lower()) + " q[" + str(idy) + "];"
+            if instr[idy][idx][0] == "X" or instr[idy][idx][0] == "T":
+                if len(instr[idy][idx]) > 2:
+                    if instr[idy][idx][-1] == "0":
+                        for i in range(idy + 1, len(instr)):
+                            if instr[i][idx][-1] == "1" and instr[i][idx][-3] == instr[idy][idx][-3] :
+                                qasm_code += "\ncx q[" + str(idy) + "], q[" + str(i) +"];" if instr[idy][idx][0] == "X" else "\ncr8 q[" + str(idy) + "], q[" + str(i) +"];"
+
+                else:
+                    qasm_code += "\n" + (instr[idy][idx][0].lower() if instr[idy][idx][0] == "X" else "r8") + " q[" + str(idy) + "];"
+            if instr[idy][idx] == "M":
+                if classical_pointer <= classical_wires:
+                    qasm_code += "\nmeasure q[" + str(idy) + "] -> c[" + str(classical_pointer) + "];"
+                    classical_pointer += 1
+
+    return qasm_code
+
+
 @app_bp.route('/circuit', methods=['GET', 'POST'])
 @login_required
 def launch():
@@ -28,7 +63,8 @@ def launch():
         item = Circuit.query.get_or_404(item_id)
         if current_user != item.author:
             return jsonify(message=_('Permission denied.')), 403
-        return render_template('_circuit.html', circuit=item)
+        qasmCircuit = qasmConverter(item.body)
+        return render_template('_circuit.html', circuit=item, qasmCir = qasmCircuit)
     return jsonify(message=_('Something went wrong~'))
 
 @app_bp.route('/circuit/<int:item_id>/edit', methods=['PUT'])
@@ -42,9 +78,9 @@ def edit_circuit(item_id):
     if data is None or data['playgroundInput'].strip() == '':
         return jsonify(message=_('Invalid item name.')), 400
     item.body = data['playgroundInput']
-    print(item.body)
+    qasmCircuit = qasmConverter(item.body)
     db.session.commit()
-    return jsonify(message=_('Circuit updated.'))
+    return jsonify(message=_('Circuit updated.'), qasmCir = qasmCircuit)
 
 @app_bp.route('/items/new', methods=['POST'])
 @login_required

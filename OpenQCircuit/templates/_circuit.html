@@ -1,21 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="left" style="margin: 7rem;" data-id="{{circuit.id}}" data-href="{{ url_for('.edit_circuit', item_id=circuit.id) }}">
-    <h3>{{circuit.name}} Playground</h3>
+<div class="left" style="margin: 7rem;" data-id="{{circuit.id}}"
+    data-href="{{ url_for('.edit_circuit', item_id=circuit.id) }}">
+    <h3 style="text-align: center;">{{circuit.name}} Playground</h3>
 
     <div class='Q-circuit-palette'></div>
     <div id="playground"></div>
-
-    <p>
-        Type, paste, or edit your circuit here.
-        Then tap “Apply” to
-        generate an interactive circuit diagram
-        and other output formats below.
-        You can learn more about Q’s plain text format
-        in <a href="Q-Circuit.html#Writing_quantum_circuits">“Writing quantum circuits.”</a>
-    </p>
-
     <textarea class="Q-circuit-text-input" id="playground-input">{{circuit.body}}</textarea>
     <p>
         <button class="Q-button" id="playground-apply-button" type="button" onclick="updatePlaygroundFromText()">
@@ -26,55 +17,138 @@
         </button>
         <br><br>
     </p>
-    <div>
-        <h4>Result probabilities</h4>
-        <pre><samp id="playground-report"></samp></pre>
+    <br>
+    <p>
+        Type, paste, or edit your circuit here.
+        Then tap “Apply” to
+        generate an interactive circuit diagram
+        and other output formats below.
+        You can learn more about Q’s plain text format
+        in <a href="Q-Circuit.html#Writing_quantum_circuits">“Writing quantum circuits.”</a>
+        <br>
+        Tap "Save" to save the code
+        and generate updated 3rd party codes below.
+    </p>
+    <br><br>
+    <ul class="tabs tabs-fixed-width tab-demo z-depth-1" id="local-sims">
+        <li class="tab"><a class="active" href="#Qiskit">Qiskit</a></li>
+        <li class="tab"><a href="#Cirq">Cirq</a></li>
+        <li class="tab"><a href="#QSharp">Q#</a></li>
+        <li class="tab"><a href="#Braket">Braket</a></li>
+        <li class="tab"><a href="#PyQuil">PyQuil</a></li>
+        <li class="tab"><a href="#Tensor">Tensorflow</a></li>
+        <li class="tab"><a href="#QASM">QASM</a></li>
+    </ul>
+    <div id="rawQASM" style="display:none;">{{qasmCir}}</div>
+    <div id="Qiskit" class="col s12">
+        <pre><code data-language="python" class="python"></code></pre>
+        <button class="Q-button tooltipped" id="playground-Run-button" data-position="bottom"
+            data-tooltip="Run Qiskit locally" type="button">
+            Run
+        </button>
+        <button class="copy btn tooltipped" onclick="copyToClipboard()" data-position="bottom" data-tooltip="Copy"
+            type="button">Copy to Clipboard</button>
     </div>
-
-    <h4>Circuit as ASCII diagram</h4>
-    <p>
-        This can be particularly helpful within the JavaScript console
-        when you need to double check the composition of a circuit
-        in a way that’s more illustrative than simple plain text.
-    </p>
-    <pre><samp id="playground-diagram"></samp></pre>
-
-
-    <!-- h4>Circuit as Amazon Braket code</h4>
-    <p>
-        This code can be copied and then pasted in to an
-        <a href="https://aws.amazon.com/braket/" target="_blank">Amazon Braket</a> Jupyter notebook
-        to be run on a cloud-based simulator
-        or actual quantum hardware.
-        (Requires an 
-        <a href="https://aws.amazon.com/" target="_blank">AWS account</a> and fees may apply.)
-    </p>
-    <pre><samp id="playground-braket"></samp></pre -->
-
-
-    <h4>Circuit as LaTeX code</h4>
-    <p>
-        This code can be used within
-        <a href="https://www.latex-project.org/" target="_blank">LaTeX</a> with the
-        <a href="https://ctan.org/pkg/qcircuit?lang=en" target="_blank">QCircuit</a>
-        library to create circuit diagrams.
-        Note that <code>ctrl{}</code> commands do not yet contain valid index values.
-        <span class="coming-soon">Check back in May 2020.</span>
-    </p>
-    <pre><samp id="playground-latex"></samp></pre>
-
-
-    <h4>Circuit as plain text</h4>
-    <p>
-        If all’s gone well
-        then copying this and pasting this code
-        in to the original text input box
-        should have no effect on the maths.
-    </p>
-    <pre><samp id="playground-text"></samp></pre>
-    <hr>
+    <div id="Cirq" class="col s12">
+        <pre><code data-language="python" class="python"></code></pre>
+        <button class="Q-button tooltipped" id="playground-Run-button" data-position="bottom"
+            data-tooltip="Run Cirq locally" type="button">
+            Run
+        </button>
+        <button class="copy btn tooltipped" onclick="copyToClipboard()" data-position="bottom" data-tooltip="Copy"
+            type="button">Copy to Clipboard</button>
+    </div>
+    <div id="QSharp" class="col s12">
+        <pre><code data-language="python" class="python"></code></pre>
+        <button class="Q-button tooltipped" id="playground-Run-button" data-position="bottom"
+            data-tooltip="Run QSharp locally" type="button">
+            Run
+        </button>
+        <button class="copy btn tooltipped" onclick="copyToClipboard()" data-position="bottom" data-tooltip="Copy"
+            type="button">Copy to Clipboard</button>
+    </div>
+    <div id="Braket" class="col s12">
+        <pre><code data-language="python" class="python"></code></pre>
+        <button class="Q-button tooltipped" id="playground-Run-button" data-position="bottom"
+            data-tooltip="Run Braket locally" type="button">
+            Run
+        </button>
+        <button class="copy btn tooltipped" onclick="copyToClipboard()" data-position="bottom" data-tooltip="Copy"
+            type="button">Copy to Clipboard</button>
+    </div>
+    <div id="PyQuil" class="col s12">
+        <pre><code data-language="python" class="python"></code></pre>
+        <button class="Q-button tooltipped" id="playground-Run-button" data-position="bottom"
+            data-tooltip="Run PyQuil locally" type="button">
+            Run
+        </button>
+        <button class="copy btn tooltipped" onclick="copyToClipboard()" data-position="bottom" data-tooltip="Copy"
+            type="button">Copy to Clipboard</button>
+    </div>
+    <div id="Tensor" class="col s12">
+        <pre><code data-language="python" class="python"></code></pre>
+        <button class="Q-button tooltipped" id="playground-Run-button" data-position="bottom"
+            data-tooltip="Run Tensor locally" type="button">
+            Run
+        </button>
+        <button class="copy btn tooltipped" onclick="copyToClipboard()" data-position="bottom" data-tooltip="Copy"
+            type="button">Copy to Clipboard</button>
+    </div>
+    <div id="QASM" class="col s12">
+        <pre><code data-language="python" class="python"></code></pre>
+        <button class="Q-button tooltipped" id="playground-Run-button" data-position="bottom"
+            data-tooltip="Run QASM locally" type="button">
+            Run
+        </button>
+        <button class="copy btn tooltipped" onclick="copyToClipboard()" data-position="bottom" data-tooltip="Copy"
+            type="button">Copy to Clipboard</button>
+    </div>
     </main>
     <script>
+        window.circuitConversion = () => {
+
+            //Initialising QuantumCircuit
+            var circuit = new QuantumCircuit()
+            var rawQASMCirc = document.querySelector("#rawQASM").innerText
+            circuit.importQASM(rawQASMCirc, function (errors) {
+                if (errors) console.log(errors);
+            });
+
+            //Conversion of the circuits
+            var qiskitCir = circuit.exportQiskit("", false, null, null);
+            var cirqCir = circuit.exportCirq("", false, null, null);
+            var qsharpCir = circuit.exportQSharp("", false, null, null, false, null);
+            var braketCir = circuit.exportBraket("", false, null, null, false, null, null, null)
+            var pyquilCir = circuit.exportPyquil("", false, null, "2.1", "", false);
+            var tfqCir = circuit.exportTFQ("", false, null, 0.2, false, 1024);
+            var qasmCir = circuit.exportQASM("", false);
+
+            //Update the tabs
+            document.querySelector("#Qiskit > pre > code").innerHTML = qiskitCir
+            document.querySelector("#Cirq > pre > code").innerText = cirqCir
+            document.querySelector("#QSharp > pre > code").innerText = qsharpCir
+            document.querySelector("#Braket > pre > code").innerText = braketCir
+            document.querySelector("#PyQuil > pre > code").innerText = pyquilCir
+            document.querySelector("#Tensor > pre > code").innerText = tfqCir
+            document.querySelector("#QASM > pre > code").innerText = qasmCir
+            hljs.initHighlighting()
+        }
+        circuitConversion()
+
+        function copyToClipboard() {
+            var localsim = document.querySelector("#local-sims .active").href.match("\#[A-z]*")[0]
+            /* Get the text field */
+            var copyText = document.querySelector(localsim + " pre code").innerText
+
+            try {
+                navigator.clipboard.writeText(copyText);
+                var tooltip = document.querySelector(localsim + " .copy")
+                tooltip.innerText = "Copied"
+            } catch (error) {
+                console.error("copy failed", error);
+            }
+        }
+
         //  Let’s place circuit palettes
         //  inside anything with the class 'Q-circuit-palette'.
         document.querySelector('main').style.maxWidth = '80%';
@@ -94,7 +168,10 @@
         function applyButtonActivated() {
 
             const button = document.getElementById('playground-apply-button')
-            if (button && button.getAttribute('disabled') === null) updatePlaygroundFromText()
+            if (button && button.getAttribute('disabled') === null) {
+                circuitConversion()
+                updatePlaygroundFromText()
+            }
         }
 
         let playgroundInputText = ''
@@ -140,13 +217,15 @@
                         circuit.sort$() //  Is this still necessary??
                         circuit.toDom(domEl)
                     }
-                    circuit.evaluate$()
+                    // circuit.evaluate$()
                 } else {
 
                     updateCircuitParts(Q `I`)
                     console.log('There’s an error in your circuit!!')
                 }
             }
+            circuitConversion()
+            hljs.initHighlighting()
         }
 
 
@@ -160,7 +239,7 @@
 
                 const text = circuit.toText().substr(1)
                 inputEl.value = text
-                circuit.evaluate$()
+                // circuit.evaluate$()
                 // updateCircuitParts( circuit )
                 playgroundInputText = text
             }

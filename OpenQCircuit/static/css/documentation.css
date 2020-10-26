@@ -433,14 +433,14 @@ cite p:before {
 pre {
 
 	margin: 0.5rem 0;
-	max-width: 45%;
+	max-width: 100%;
 	max-height: 360px;
 	border-radius: 0.5rem;
 	background-color: hsl( 
 		
 		var( --Q-color-background-hue ),
 		var( --Q-color-background-saturation ),
-		98%
+		98%	
 	);
 	padding: 0  0 1.5rem 1rem;
 	white-space: pre;

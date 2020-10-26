@@ -447,7 +447,7 @@ Object.assign( Q.Circuit.Editor, {
 
 		paletteEl.classList.add( 'Q-circuit-palette' )
 
-		'HXYZPT*'
+		'HXYZPTM*'
 		.split( '' )
 		.forEach( function( symbol ){
 
@@ -1341,7 +1341,7 @@ Q.Circuit.Editor.onPointerPress = function( event ){
 				if( inputEl ){
 					inputEl.value = circuit.toText().trimStart()
 				}
-				circuit.evaluate$()
+				// circuit.evaluate$()
 			}
 			else {
 	

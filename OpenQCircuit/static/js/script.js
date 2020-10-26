@@ -300,7 +300,11 @@ $(document).ready(function () {
             data: JSON.stringify(data),
             contentType: 'application/json;charset=UTF-8',
             success: function (data) {
-
+                document.querySelector("#rawQASM").innerText = data.qasmCir;
+                circuitConversion()
+                M.toast({
+                    html: data.message
+                });
             }
         })
 
